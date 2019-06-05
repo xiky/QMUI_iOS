@@ -1,9 +1,16 @@
+/*****
+ * Tencent is pleased to support the open source community by making QMUI_iOS available.
+ * Copyright (C) 2016-2019 THL A29 Limited, a Tencent company. All rights reserved.
+ * Licensed under the MIT License (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at
+ * http://opensource.org/licenses/MIT
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
+ *****/
+
 //
 //  QMUIMultipleDelegates.m
 //  QMUIKit
 //
-//  Created by MoLice on 2018/3/27.
-//  Copyright © 2018年 QMUI Team. All rights reserved.
+//  Created by QMUI Team on 2018/3/27.
 //
 
 #import "QMUIMultipleDelegates.h"
@@ -63,7 +70,7 @@
     NSPointerArray *delegates = [self.delegates copy];
     for (id delegate in delegates) {
         result = [delegate methodSignatureForSelector:aSelector];
-        if (result) {
+        if (result && [delegate respondsToSelector:aSelector]) {
             return result;
         }
     }
@@ -99,12 +106,11 @@
             return YES;
         }
         
-        // 对 QMUIMultipleDelegates 额外处理的解释在这里：https://github.com/QMUI/QMUI_iOS/issues/357
+        // 对 QMUIMultipleDelegates 额外处理的解释在这里：https://github.com/Tencent/QMUI_iOS/issues/357
         BOOL delegateCanRespondToSelector = [delegate isKindOfClass:self.class] ? [delegate respondsToSelector:aSelector] : class_respondsToSelector(((NSObject *)delegate).class, aSelector);
         
-        // 判断 qmui_delegatesSelf 是为了解决这个 issue：https://github.com/QMUI/QMUI_iOS/issues/346
+        // 判断 qmui_delegatesSelf 是为了解决这个 issue：https://github.com/Tencent/QMUI_iOS/issues/346
         BOOL isDelegateSelf = ((NSObject *)delegate).qmui_delegatesSelf;
-        
         if (delegateCanRespondToSelector && !isDelegateSelf) {
             return YES;
         }
@@ -113,7 +119,7 @@
 }
 
 - (NSString *)description {
-    return [NSString stringWithFormat:@"%@%@", [super description], self.delegates];
+    return [NSString stringWithFormat:@"%@, parentObject is %@, %@", [super description], self.parentObject, self.delegates];
 }
 
 @end
